@@ -3,15 +3,15 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from melo import commons
-from melo import modules
-from melo import attentions
+import commons
+import modules
+import attentions
 
 from torch.nn import Conv1d, ConvTranspose1d, Conv2d
 from torch.nn.utils import weight_norm, remove_weight_norm, spectral_norm
 
-from melo.commons import init_weights, get_padding
-import melo.monotonic_align as monotonic_align
+from commons import init_weights, get_padding
+import monotonic_align as monotonic_align
 
 
 class DurationDiscriminator(nn.Module):  # vits2
