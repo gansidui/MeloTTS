@@ -30,6 +30,19 @@ PRETRAINED_MODELS = {
     'DUR.pth': 'https://myshell-public-repo-host.s3.amazonaws.com/openvoice/basespeakers/pretrained/DUR.pth',
 }
 
+# 注意：这里使用本地下载的模型，放到 melo 目录下
+PRETRAINED_MODELS_LOCAL_EN = {
+    'G.pth': 'pretrained/en/G.pth',
+    'D.pth': 'pretrained/en/D.pth',
+    'DUR.pth': 'pretrained/en/DUR.pth',
+}
+
+PRETRAINED_MODELS_LOCAL_ZH = {
+    'G.pth': 'pretrained/zh/G.pth',
+    'D.pth': 'pretrained/zh/D.pth',
+    'DUR.pth': 'pretrained/zh/DUR.pth',
+}
+
 LANG_TO_HF_REPO_ID = {
     'EN': 'myshell-ai/MeloTTS-English',
     'EN_V2': 'myshell-ai/MeloTTS-English-v2',
@@ -64,4 +77,6 @@ def load_or_download_model(locale, device, use_hf=True, ckpt_path=None):
     return torch.load(ckpt_path, map_location=device)
 
 def load_pretrain_model():
-    return [cached_path(url) for url in PRETRAINED_MODELS.values()]
+    # return [cached_path(url) for url in PRETRAINED_MODELS.values()]
+    # return list(PRETRAINED_MODELS_LOCAL_ZH.values())
+    return list(PRETRAINED_MODELS_LOCAL_EN.values())
