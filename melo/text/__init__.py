@@ -1,4 +1,5 @@
 from .symbols import *
+import os
 
 
 _symbol_to_id = {s: i for i, s in enumerate(symbols)}
@@ -33,3 +34,15 @@ def get_bert(norm_text, word2ph, language, device):
                           'FR': fr_bert, 'SP': sp_bert, 'ES': sp_bert, "KR": kr_bert}
     bert = lang_bert_func_map[language](norm_text, word2ph, device)
     return bert
+
+
+# AutoTokenizer 中的 transformers 库默认情况下，会每次请求 hugging face 检查元数据信息（用于检查版本）
+# 设置环境变量可以屏蔽掉该请求
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+
+
+# 开启 transformers 的调试日志
+# import transformers
+# transformers.utils.logging.set_verbosity_debug()
+
+
