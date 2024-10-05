@@ -9,3 +9,8 @@ build/
 
 *.zip
 *.wav
+
+data/
+logs/
+pretrained/
+models/

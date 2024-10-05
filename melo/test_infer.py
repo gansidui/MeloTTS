@@ -1,7 +1,7 @@
 import os
 from api import TTS
 
-ckpt_path = 'logs/mix_en/G_10000.pth'
+ckpt_path = 'models/mix_en/G_10000.pth'
 text = """With fusion energy at its core, Virginia would become the epicenter of the next tech revolution. Companies would flood the state, drawn by the unlimited, cheap power. Research labs would push the boundaries of AI, robotics, and space exploration, all powered by this clean energy. Job creation would skyrocket, attracting talent from across the country. But could this explosion in growth come at a price? Stay tuned to see the unexpected consequences!"""
 language = 'EN'
 output_dir = 'output'
