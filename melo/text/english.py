@@ -224,7 +224,10 @@ def g2p(text, pad_start_end=True, tokenized=None):
         if not t.startswith("#"):
             ph_groups.append([t])
         else:
-            ph_groups[-1].append(t.replace("#", ""))
+            if ph_groups:
+                ph_groups[-1].append(t.replace("#", ""))
+            else:
+                ph_groups.append([t.replace("#", "")])
     
     phones = []
     tones = []
