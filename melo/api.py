@@ -67,7 +67,8 @@ class TTS(nn.Module):
         audio_segments = []
         for segment_data in segment_data_list:
             audio_segments += segment_data.reshape(-1).tolist()
-            audio_segments += [0] * int((sr * 0.05) / speed)
+            # 这里不需要在两句话之间增加额外的静音，因为每句话末尾的静音已经足够多了。
+            # audio_segments += [0] * int((sr * 0.05) / speed)
         audio_segments = np.array(audio_segments).astype(np.float32)
         return audio_segments
 

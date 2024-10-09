@@ -8,12 +8,13 @@ import re
 from str_utils import split_long_text
 
 def split_sentence(text, min_len=10, language_str='EN'):
-    if True: # 使用新的分句方式，注意不用考虑逗号和顿号
+    if True:
         separators = []
         if language_str in ['EN', 'FR', 'ES', 'SP']:
-            separators = [". ", "! ", "? ", "; "]    
+            # 不能使用逗号分开，不然停顿太久了
+            separators = [". ", "! ", "? ", "; "]
         else:
-            separators = ["。", "！", "？", "；",]
+            separators = ["。", "！", "？", "；", "、"]
         return split_long_text(text, separators)
 
     if language_str in ['EN', 'FR', 'ES', 'SP']:
