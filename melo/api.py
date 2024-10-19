@@ -63,12 +63,30 @@ class TTS(nn.Module):
         self.language = 'ZH_MIX_EN' if language == 'ZH' else language # we support a ZH_MIX_EN model
 
     @staticmethod
-    def audio_numpy_concat(segment_data_list, sr, speed=1.):
+    def trim_silence(audio_data, threshold=5.5e-3):
+        """去除音频数据末尾的静音部分，静音定义为低于或等于阈值的连续样本。"""
+        # 从后向前查找最后一个大于阈值的样本的位置
+        indices = np.where(np.abs(audio_data) > threshold)[0]
+        if len(indices) == 0:
+            return np.array([], dtype=np.float32)  # 如果全部是静音
+        return audio_data[:indices[-1] + 1]
+
+    @staticmethod
+    def audio_numpy_concat(segment_data_list, texts, sr, speed=1.):
         audio_segments = []
-        for segment_data in segment_data_list:
-            audio_segments += segment_data.reshape(-1).tolist()
-            # 这里不需要在两句话之间增加额外的静音，因为每句话末尾的静音已经足够多了。
-            # audio_segments += [0] * int((sr * 0.05) / speed)
+        for segment_data, text in zip(segment_data_list, texts):
+            trimmed_segment = TTS.trim_silence(segment_data)
+            audio_segments += trimmed_segment.tolist()
+
+            # 根据末尾标点决定静音长度
+            if text.endswith((',', '、', '，', ':', '：')):
+                pause_duration_second = 0.22
+            else:
+                pause_duration_second = 0.44
+
+            # 添加静音
+            audio_segments += [0] * int((sr * pause_duration_second) / speed)
+
         audio_segments = np.array(audio_segments).astype(np.float32)
         return audio_segments
 
@@ -80,6 +98,12 @@ class TTS(nn.Module):
             print('\n'.join(texts))
             print(" > ===========================")
         return texts
+
+    @staticmethod
+    def strip_punctuation(text):
+        # 删除开头和末尾的标点，包括中文和英文常见的标点符号
+        punctuation = ',.!?;:()[]\'"`-。？！，、；：“”《》（）【】「」『』{}'
+        return text.strip(punctuation)
 
     def tts_to_file(self, text, speaker_id, output_path=None, sdp_ratio=0.2, noise_scale=0.6, noise_scale_w=0.8, speed=1.0, pbar=None, format=None, position=None, quiet=True,):
         language = self.language
@@ -97,6 +121,8 @@ class TTS(nn.Module):
         for t in tx:
             if language in ['EN', 'ZH_MIX_EN']:
                 t = re.sub(r'([a-z])([A-Z])', r'\1 \2', t)
+            # 句子的首尾标点会生成异常声音，需要去掉
+            t = self.strip_punctuation(t)
             device = self.device
             bert, ja_bert, phones, tones, lang_ids = utils.get_text_for_tts_infer(t, language, self.hps, device, self.symbol_to_id)
             with torch.no_grad():
@@ -125,7 +151,7 @@ class TTS(nn.Module):
                 # 
             audio_list.append(audio)
         torch.cuda.empty_cache()
-        audio = self.audio_numpy_concat(audio_list, sr=self.hps.data.sampling_rate, speed=speed)
+        audio = self.audio_numpy_concat(audio_list, texts, sr=self.hps.data.sampling_rate, speed=speed)
 
         if output_path is None:
             return audio

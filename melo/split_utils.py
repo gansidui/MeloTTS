@@ -9,12 +9,14 @@ from str_utils import split_long_text
 
 def split_sentence(text, min_len=10, language_str='EN'):
     if True:
+        # 去掉文本中不影响发音的括号、双引号、书名号
+        text = re.sub(r"[\<\>\(\)\[\]\"\«\»“”《》（）【】「」『』{}]+", "", text)
+
         separators = []
         if language_str in ['EN', 'FR', 'ES', 'SP']:
-            # 不能使用逗号分开，不然停顿太久了
-            separators = [". ", "! ", "? ", "; "]
+            separators = [", ", ". ", "! ", "? ", "; ", ": "]
         else:
-            separators = ["。", "！", "？", "；", "、"]
+            separators = ["，", "。", "！", "？", "；", "、", "："]
         return split_long_text(text, separators)
 
     if language_str in ['EN', 'FR', 'ES', 'SP']:
